@@ -979,6 +979,16 @@ class ResourceInstance(object):
 
     def __init__(self, resource, instance):
         self.resource_type = resource
+        # If we have a list of resources, then set the apiVersion and kind of
+        # reach resource in 'items'
+        kind = instance['kind']
+        if kind.endswith('List') and 'items' in instance:
+            kind = instance['kind'][:-4]
+            for i in range(len(instance['items'])):
+                instance['items'][i].update({
+                    'apiVersion': instance['apiVersion'],
+                    'kind': kind,
+                })
         self.attributes = self.__deserialize(instance)
 
     def __deserialize(self, field):
